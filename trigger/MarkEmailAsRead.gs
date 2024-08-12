@@ -69,7 +69,7 @@ function triggerMarkEmailAsRead() {
   const numNeedReaction = 6;
 
   // フィルタリングされたメールを解析
-  const aryObjAnlyEmail = aryObjEmail.map(objEmail => {
+  const analyzedAryObjEmail = aryObjEmail.map(objEmail => {
 
     console.log(objEmail.subject);
 
@@ -102,7 +102,7 @@ function triggerMarkEmailAsRead() {
     // メール件名を追加
     objJson.subject = objEmail.subject;
 
-    console.log("処理",objEmail.subject);
+    console.log("解析",objEmail.subject,"objJson.necessity",objJson.necessity);
 
     // 最後の未読メールの日付を更新
     PropertiesService.getScriptProperties().setProperty('DATE_LAST_UNREAD', objEmail.date);
@@ -118,7 +118,7 @@ function triggerMarkEmailAsRead() {
   const accessToken = PropertiesService.getScriptProperties().getProperty('LINE_NOTIFY_TOKEN');
 
   // 解析結果に応じてメールをLINEに通知または既読にする
-  aryObjAnlyEmail.forEach(objAnly => {
+  analyzedAryObjEmail.forEach(objAnly => {
     const message = '未読のメールのサマリーだよ' + '\n\n'
       + '= = = = = = = =' + '\n'
       + '件名: ' + objAnly.subject + '\n'
@@ -129,13 +129,11 @@ function triggerMarkEmailAsRead() {
       + '内容の要約:' + '\n' + objAnly.summary + '\n\n'
       + 'メールへのリンク:' + `https://mail.google.com/mail/u/${userEmail}/#inbox/${objAnly.id}`;
 
-    console.log("objAnly.necessity", objAnly.necessity);
-
     // リアクションの必要性が高い場合、LINEに通知する
     if (objAnly.necessity >= numNeedReaction) { new LineNotify(accessToken).send(message) };
 
     // リアクションの必要性が低い場合、メールを既読にする
-    if (objAnly.necessity < numNeedReaction) { markMailAsRead_(objAnly.id, true) };
+    // if (objAnly.necessity < numNeedReaction) { markMailAsRead_(objAnly.id, true) };
   })
 }
 
@@ -184,5 +182,5 @@ function markMailAsRead_(idMessage, isRead) {
   const message = GmailApp.getMessageById(idMessage);
 
   // メッセージが存在し、かつisReadがtrueの場合はメールを既読にする
-  // if (message && isRead) { message.markRead() };
+  if (message && isRead) { message.markRead() };
 }
