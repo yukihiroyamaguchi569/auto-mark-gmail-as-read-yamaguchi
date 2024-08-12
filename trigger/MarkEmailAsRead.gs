@@ -150,7 +150,7 @@ function triggerMarkEmailAsRead() {
 function getAllUnreadEmails_() {
 
   // 過去のメールを検索するクエリ
-    const query = 'newer_than:2h';
+    const query = 'newer_than:2h　-label:"AIチェック済"';
 
   // 過去2日間のメールを検索
   const aryThreads = GmailApp.search(query);
