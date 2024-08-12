@@ -29,29 +29,29 @@ function triggerMarkEmailAsRead() {
    * @return {Date} dateLastUnread - 最後に未読メッセージを確認した日付
    */
 
-  const getDateLastUnread = () => {
-    // プロパティストアから最後に未読メッセージを確認した日付を取得
-    const strDateLastUnread = PropertiesService.getScriptProperties().getProperty('DATE_LAST_UNREAD');
+  // const getDateLastUnread = () => {
+  //   // プロパティストアから最後に未読メッセージを確認した日付を取得
+  //   const strDateLastUnread = PropertiesService.getScriptProperties().getProperty('DATE_LAST_UNREAD');
 
-    // 日付が存在する場合はその日付を返す
-    if (strDateLastUnread) {
-      return new Date(strDateLastUnread)
-    };
+  //   // 日付が存在する場合はその日付を返す
+  //   if (strDateLastUnread) {
+  //     return new Date(strDateLastUnread)
+  //   };
 
-    // 日付が存在しない場合は1ヶ月前の日付を計算して返す
-    const now = new Date();
-    const dateOneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-    return new Date(dateOneMonthAgo);
-  };
+  //   // 日付が存在しない場合は1ヶ月前の日付を計算して返す
+  //   const now = new Date();
+  //   const dateOneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+  //   return new Date(dateOneMonthAgo);
+  // };
 
-  // 最後の未読メールの日付を取得
-  const dateLastUnread = getDateLastUnread();
+  // // 最後の未読メールの日付を取得
+  // const dateLastUnread = getDateLastUnread();
 
-  // 最後の未読メールの日付以降のメールをフィルタリングし、日付でソート
-  const aryFilEmail = aryObjEmail.filter(email => email.date > dateLastUnread).sort((a, b) => a.date - b.date);
+  // // 最後の未読メールの日付以降のメールをフィルタリングし、日付でソート
+  // const aryFilEmail = aryObjEmail.filter(email => email.date > dateLastUnread).sort((a, b) => a.date - b.date);
 
   // 新しいメッセージがなければ処理を中止
-  if (aryFilEmail.length === 0) {
+  if (aryObjEmail.length === 0) {
         console.log("新しいメールはありません") ;
         return 
         };
@@ -69,7 +69,7 @@ function triggerMarkEmailAsRead() {
   const numNeedReaction = 6;
 
   // フィルタリングされたメールを解析
-  const aryObjAnlyEmail = aryFilEmail.map(objEmail => {
+  const aryObjAnlyEmail = aryObjEmail.map(objEmail => {
 
     console.log(objEmail.subject);
 
