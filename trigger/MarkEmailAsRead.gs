@@ -51,7 +51,10 @@ function triggerMarkEmailAsRead() {
   const aryFilEmail = aryObjEmail.filter(email => email.date > dateLastUnread).sort((a, b) => a.date - b.date);
 
   // 新しいメッセージがなければ処理を中止
-  if (aryFilEmail.length === 0) { return };
+  if (aryFilEmail.length === 0) {
+        console.log("新しいメールはありません") ;
+        return 
+        };
 
   // APIキーを設定
   const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
@@ -68,24 +71,18 @@ function triggerMarkEmailAsRead() {
   // フィルタリングされたメールを解析
   const aryObjAnlyEmail = aryFilEmail.map(objEmail => {
 
-    console.log(objEmail);
+    console.log(objEmail.subject);
 
     // メール本文を取得
     const body = objEmail.body;
 
-    console.log(body);
-
     // システムロールの設定
     const systemRole = "あなたは「だよ・だね」と親しみやすい言葉で話すAIアシスタントです。あなたは、メールの本文を解析し、そのメールが返信や他のリアクションが必要かどうかを0から10の数値で判別します。回答は必ずJSON形式で出力します。";
-
-    console.log(systemRole);
    
     // プロンプトの設定
     const prompt = '以下のメール本文を評価してください。リアクションが必要かどうかを0から10のスケールで数値で示し、リアクションが必要な理由とメール本文の要約を併せて指定されたJSONスキーマで出力してください。'
       + '### メール本文:' + body + '\n'
       + '### 出力JSONスキーマ:{"necessity": [0から10のスケールの数値],"reason": [リアクションが必要な理由],"summary": [メール本文の要約]}';
-
-    console.log(prompt);
 
     // OpenAIChat APIを使って応答を取得
     const response = openAIChat.askSimple(systemRole, prompt, model);
@@ -104,6 +101,8 @@ function triggerMarkEmailAsRead() {
 
     // メール件名を追加
     objJson.subject = objEmail.subject;
+
+    console.log("処理",objEmail.subject);
 
     // 最後の未読メールの日付を更新
     PropertiesService.getScriptProperties().setProperty('DATE_LAST_UNREAD', objEmail.date);
@@ -130,7 +129,7 @@ function triggerMarkEmailAsRead() {
       + '内容の要約:' + '\n' + objAnly.summary + '\n\n'
       + 'メールへのリンク:' + `https://mail.google.com/mail/u/${userEmail}/#inbox/${objAnly.id}`;
 
-    console.log(objAnly.necessity);
+    console.log("objAnly.necessity", objAnly.necessity);
 
     // リアクションの必要性が高い場合、LINEに通知する
     if (objAnly.necessity >= numNeedReaction) { new LineNotify(accessToken).send(message) };
@@ -186,9 +185,4 @@ function markMailAsRead_(idMessage, isRead) {
 
   // メッセージが存在し、かつisReadがtrueの場合はメールを既読にする
   // if (message && isRead) { message.markRead() };
-}
-
-function test_20240812_1000() {
-        const strDateLastUnread = PropertiesService.getScriptProperties().getProperty('DATE_LAST_UNREAD');
-        console.log(strDateLastUnread);   
 }
