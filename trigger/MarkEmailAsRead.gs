@@ -20,47 +20,10 @@ function triggerMarkEmailAsRead() {
   const aryObjEmail = getAllUnreadEmails_();
 
   // 新しいメッセージがなければ処理を中止
-  if (aryObjEmail.length === 0) { return };
-
-  /**
-   * 最後に未読メッセージを確認した日付を取得する関数
-   * プロパティストアに記録が無い場合は1年前の日付を返す
-   *
-   * @return {Date} dateLastUnread - 最後に未読メッセージを確認した日付
-   */
-
-  // const getDateLastUnread = () => {
-  //   // プロパティストアから最後に未読メッセージを確認した日付を取得
-  //   const strDateLastUnread = PropertiesService.getScriptProperties().getProperty('DATE_LAST_UNREAD');
-
-  //   // 日付が存在する場合はその日付を返す
-  //   if (strDateLastUnread) {
-  //     return new Date(strDateLastUnread)
-  //   };
-
-  //   // 日付が存在しない場合は1ヶ月前の日付を計算して返す
-  //   const now = new Date();
-  //   const dateOneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-  //   return new Date(dateOneMonthAgo);
-  // };
-
-  // // 最後の未読メールの日付を取得
-  // const dateLastUnread = getDateLastUnread();
-
-  // // 最後の未読メールの日付以降のメールをフィルタリングし、日付でソート
-  // const aryFilEmail = aryObjEmail.filter(email => email.date > dateLastUnread).sort((a, b) => a.date - b.date);
-
-  // 新しいメッセージがなければ処理を中止
   if (aryObjEmail.length === 0) {
         console.log("新しいメールはありません") ;
         return 
         };
-
-  // APIキーを設定
-  const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  // 使用するモデルを指定
-  const model = 'gpt-4o-mini';
 
   // OpenAIChatクラスを初期化
   const openAIChat = new OpenAIChat(apiKey);
@@ -71,7 +34,7 @@ function triggerMarkEmailAsRead() {
   // フィルタリングされたメールを解析
   const analyzedAryObjEmail = aryObjEmail.map(objEmail => {
 
-    console.log(objEmail.subject);
+    // console.log(objEmail.subject);
 
     // メール本文を取得
     const body = objEmail.body;
@@ -189,6 +152,12 @@ function markMailAsRead_(idMessage, isRead) {
   if (message && isRead) { message.markRead() };
 }
 
+/**
+ * メールのメッセージIDを受け取って、メールにラベルをつける関数
+ *
+ * @param {string} idMessage - メールのメッセージID
+ * @return {void}
+ */
 function setLabel_(idMessage){
   // Gmailのメッセージを取得する
   const message = GmailApp.getMessageById(idMessage);
