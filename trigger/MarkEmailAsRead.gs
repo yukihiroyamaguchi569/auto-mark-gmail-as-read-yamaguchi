@@ -104,8 +104,11 @@ function triggerMarkEmailAsRead() {
 
     console.log("解析",objEmail.subject,"objJson.necessity",objJson.necessity);
 
+    // チェック済のラベルをつける
+    setLabel_(objEmail.id);
+
     // 最後の未読メールの日付を更新
-    PropertiesService.getScriptProperties().setProperty('DATE_LAST_UNREAD', objEmail.date);
+    // PropertiesService.getScriptProperties().setProperty('DATE_LAST_UNREAD', objEmail.date);
 
     // 解析結果を返す
     return objJson;
@@ -118,22 +121,23 @@ function triggerMarkEmailAsRead() {
   const accessToken = PropertiesService.getScriptProperties().getProperty('LINE_NOTIFY_TOKEN');
 
   // 解析結果に応じてメールをLINEに通知または既読にする
-  analyzedAryObjEmail.forEach(objAnly => {
+  analyzedAryObjEmail.forEach(objMail => {
     const message = '未読のメールのサマリーだよ' + '\n\n'
       + '= = = = = = = =' + '\n'
-      + '件名: ' + objAnly.subject + '\n'
+      + '件名: ' + objMail.subject + '\n'
       + '= = = = = = = =' + '\n' + '\n'
-      + '受信日時:' + Utilities.formatDate(objAnly.date, 'JST', 'yyyy-MM-dd HH:mm') + '\n\n'
-      + 'リアクションの必要性:' + objAnly.necessity + '\n' + '\n'
-      + '必要な理由:' + '\n' + objAnly.reason + '\n\n'
-      + '内容の要約:' + '\n' + objAnly.summary + '\n\n'
-      + 'メールへのリンク:' + `https://mail.google.com/mail/u/${userEmail}/#inbox/${objAnly.id}`;
+      + '受信日時:' + Utilities.formatDate(objMail.date, 'JST', 'yyyy-MM-dd HH:mm') + '\n\n'
+      + 'リアクションの必要性:' + objMail.necessity + '\n' + '\n'
+      + '必要な理由:' + '\n' + objMail.reason + '\n\n'
+      + '内容の要約:' + '\n' + objMail.summary + '\n\n'
+      + 'メールへのリンク:' + `https://mail.google.com/mail/u/${userEmail}/#inbox/${objMail.id}`;
 
     // リアクションの必要性が高い場合、LINEに通知する
-    if (objAnly.necessity >= numNeedReaction) { new LineNotify(accessToken).send(message) };
+    if (objMail.necessity >= numNeedReaction) { new LineNotify(accessToken).send(message) };
 
-    // リアクションの必要性が低い場合、メールを既読にする
-    // if (objAnly.necessity < numNeedReaction) { markMailAsRead_(objAnly.id, true) };
+    // リアクションの必要性が低い場合、メールにタグをつける
+    // if (objMail.necessity < numNeedReaction) { markMailAsRead_(objMail.id, true) };
+
   })
 }
 
@@ -183,4 +187,14 @@ function markMailAsRead_(idMessage, isRead) {
 
   // メッセージが存在し、かつisReadがtrueの場合はメールを既読にする
   if (message && isRead) { message.markRead() };
+}
+
+function setLabel_(idMessage){
+  // Gmailのメッセージを取得する
+  const message = GmailApp.getMessageById(idMessage);
+  const thread = message.getThread();
+
+  //　ラベルをつける
+  targetLabel.addToThread(thread);
+
 }
