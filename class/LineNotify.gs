@@ -63,18 +63,3 @@ function testLineNotify() {
   new LineNotify(accessToken).send(message);
 }
 
-/**
- * スクリプトプロパティにLINEアクセストークンを書き込み、確認する関数
- * 初回のみ使用
- */
-
-function setAndGetAccessToken(){
- const properties = PropertiesService.getScriptProperties();
-
- properties.setProperty('LINE_NOTIFY_TOKEN','qKbt27uVZlSwjz1JlkJCxJmJ4Ku9BydnpTrnoKvs2tx');
- 
- const accessToken = properties.getProperty("LINE_NOTIFY_TOKEN");
-
- console.log(accessToken)
-
-}
